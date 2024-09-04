@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - Holly Jolly Show</title>
+    <!-- Link to Google Font for consistency -->
+    <link href="https://fonts.googleapis.com/css2?family=Arial&display=swap" rel="stylesheet">
+    <style>
+        /* Basic styles for the page */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #FF0000; /* Festive red color */
+            font-family: 'Great Vibes', cursive;
+        }
+
+        .team-member {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 20px;
+        }
+
+        .team-member img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            margin-right: 20px;
+            object-fit: cover;
+        }
+
+        .team-member:last-child {
+            border-bottom: none; /* Remove border for the last member */
+        }
+
+        .team-member div {
+            flex: 1;
+        }
+
+        .name {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .bio {
+            font-size: 16px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>About Us</h1>
+        <!-- Team Member 1: Aaron -->
+        <div class="team-member">
+            <img src="images/aaron.png" alt="Aaron's photo">
+            <div>
+                <div class="name">Aaron</div>
+                <div class="bio">
+                    Aaron is a Minnesota native that has been calling Seattle home for the last five years. When not adventuring in the mountains or attending a rave, you can find him singing with The Esoterics or performing at local churches. Additionally, Aaron plays tuba and baritone for the Redmond Tech Orchestra and is a member of various LGBTQI+ clubs and organizations. He has enjoyed hosting and producing the Holly Jolly Holiday Show and hopes to see you there for the 4th anniversary!
+                </div>
+            </div>
+        </div>
+
+        <!-- Team Member 2: Bryan -->
+        <div class="team-member">
+            <img src="images/bryan.jpg" alt="Bryan's photo">
+            <div>
+                <div class="name">Bryan</div>
+                <div class="bio">
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque at semper erat, ut cursus elit. Nullam luctus orci vel lorem congue, vel gravida purus tempus. Curabitur efficitur arcu a ligula interdum, ut facilisis ligula sollicitudin. Duis ac urna sit amet nisi fermentum ultricies. Maecenas bibendum consequat orci, nec finibus eros tincidunt id.
+                </div>
+            </div>
+        </div>
+
+        <!-- Team Member 3: Holly -->
+        <div class="team-member">
+            <img src="images/holly.jpg" alt="Holly's photo">
+            <div>
+                <div class="name">Holly</div>
+                <div class="bio">
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce scelerisque felis quis nunc interdum, sit amet fermentum purus blandit. Sed sit amet enim eu elit auctor ullamcorper. Integer bibendum lorem a orci consequat, vitae luctus turpis malesuada. Morbi ac nulla vel sem varius ultricies id sed urna.
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
