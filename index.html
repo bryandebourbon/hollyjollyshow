@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Holly Jolly Show</title>
+    <!-- Link to Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
+    <style>
+        /* Basic styles for the page */
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* Prevent scrolling */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            position: relative;
+        }
+
+        .carousel {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .carousel-images {
+            display: flex;
+            transition: transform 0.5s ease;
+            height: 100%;
+            width: 100vw; /* Set to the width of the viewport */
+        }
+
+        .carousel-images img {
+            min-width: 100vw; /* Ensures each image takes the full width of the viewport */
+            height: 100vh; /* Ensures each image takes the full height of the viewport */
+            object-fit: cover; /* Ensures images cover the entire container */
+        }
+
+        .title-container {
+            position: absolute;
+            top: 20px;
+            width: 100%;
+            text-align: center;
+            z-index: 10; /* Ensures the title is on top of everything */
+        }
+
+        .title {
+            font-family: 'Great Vibes', cursive;
+            font-size: 64px; /* Adjust size as needed */
+            color: #FF0000; /* Festive red color */
+            text-shadow: 2px 2px 4px #000000; /* Adds a subtle shadow for contrast */
+            margin: 0;
+        }
+
+        .separator {
+            margin: 10px auto;
+            width: 50%;
+            border: 0;
+            height: 1px;
+            background-color: #ff0000; /* Festive red color */
+        }
+
+        .about-link {
+            font-size: 18px;
+            color: #ffffff; /* White color for visibility */
+            text-decoration: none;
+            background-color: #ff0000; /* Festive red background */
+            padding: 8px 16px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-top: 10px;
+            transition: background-color 0.3s;
+        }
+
+        .about-link:hover {
+            background-color: #cc0000; /* Darker red on hover */
+        }
+
+        .controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            justify-content: space-between;
+            width: 200px;
+        }
+
+        .button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <!-- Title and Link Container -->
+    <div class="title-container">
+        <h1 class="title">Holly Jolly Show</h1>
+        <hr class="separator">
+        <a href="about.html" class="about-link">About Us</a>
+    </div>
+
+    <div class="carousel">
+        <div class="carousel-images" id="carousel-images">
+            <!-- Images will be dynamically added here by JavaScript -->
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="button" onclick="prevImage()">Previous</button>
+        <button class="button" onclick="nextImage()">Next</button>
+    </div>
+
+    <script>
+        // Array of image filenames in the "images" folder
+        const imageFilenames = [
+            'DSCF3688.jpg',
+            'SLVR0520.jpg',
+            'SLVR0561.jpg',
+            'SLVR0599.jpg',
+            'SLVR0667.jpg',
+            'SLVR0668.jpg'
+        ];
+
+        // Function to dynamically load images
+        function loadImages() {
+            const carouselImages = document.getElementById('carousel-images');
+            imageFilenames.forEach(filename => {
+                const img = document.createElement('img');
+                img.src = `images/${filename}`; // Corrected image path
+                img.alt = filename;
+                carouselImages.appendChild(img);
+            });
+        }
+
+        // Call loadImages to populate the carousel
+        loadImages();
+
+        // JavaScript to handle image carousel
+        let currentIndex = 0;
+        const images = document.querySelectorAll('#carousel-images img');
+
+        function showImage(index) {
+            const totalImages = images.length;
+            currentIndex = (index + totalImages) % totalImages;
+            const offset = -currentIndex * 100; // Calculate offset for transform
+            document.getElementById('carousel-images').style.transform = `translateX(${offset}vw)`;
+        }
+
+        function prevImage() {
+            showImage(currentIndex - 1);
+        }
+
+        function nextImage() {
+            showImage(currentIndex + 1);
+        }
+
+        // Auto-rotate images every 3 seconds
+        setInterval(nextImage, 3000);
+    </script>
+</body>
+</html>
