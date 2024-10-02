@@ -13,6 +13,7 @@
             margin: 0;
             padding: 20px;
             background-color: #f5f5f5;
+            color: #333;
         }
 
         .container {
@@ -72,28 +73,71 @@
             font-size: 16px;
             color: #555;
         }
+        .back-button {
+            display: block;
+            margin: 10px 0 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            color: #ffffff;
+            background-color: #ff0000; /* Festive red color */
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .back-button:hover {
+            background-color: #cc0000; /* Darker red for hover state */
+        }
+
+        .back-button:active {
+            background-color: #990000; /* Even darker red for active state */
+        }
+
+
+        /* Dark Mode Support */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #121212;
+                color: #e0e0e0;
+            }
+
+            .container {
+                background-color: #1e1e1e;
+                box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1);
+            }
+
+            h1 {
+                color: #FF6347; /* Lighter festive color for better contrast */
+            }
+
+            .intro, .name, .bio {
+                color: #e0e0e0;
+            }
+
+            .team-member {
+                border-bottom: 1px solid #333;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
+        <!-- Back Button -->
+        <button class="back-button" onclick="window.location.href='index.html'">Back to Home</button>
+
         <h1>About Us</h1>
 
         <!-- Introduction Statement -->
         <div class="intro">
-            Seattle's seasonal variety show is back and more festive than ever! Please join us for the 3rd Annual Holly Jolly Holiday Show on Thursday, December 14 at Chop Suey.<br><br>
-
-            In typical fashion, the night begins with a showcase of holiday songs sung by a variety of singers while accompanied by pianist Holly Thornton. As the evening continues, you'll be entertained by local comedians, musicians, and drag queens such as First Lady Sable Jones St. James! Rest assured the party will continue into the night with DJ Woodrow Low playing holiday hits and dance remixes.<br><br>
-
-            This cocktail cabaret-like affair encourages you to walk around and mingle throughout the performances. Be sure to explore the venue and shop the maker's market filled with local crafters providing custom gift ideas for friends and family!<br><br>
-
-            Tickets start at $15 through Thanksgiving weekend, November 26. Tickets are $20 from November 27 - December 13, and they are $25 online and at the door on December 14.<br><br>
-
-            Don't forget to show off your second-hand style for this year's theme: Thriftmas. Doors open at 7pm, and the show starts at 8pm!
+            Welcome to the Holly Jolly Show, a celebration of talent and festive cheer that brings together performers of all kinds. Our show is a vibrant tapestry of musical performances, dazzling dance routines, and laugh-out-loud comedy acts—all set against a backdrop of holiday magic. With a lineup that features everything from drag artistry to instrumental showcases, we aim to uplift and inspire by creating a joyful space where creativity knows no bounds.
+        
+            Each performer brings their unique flair, personality that fosters an inclusive, supportive artistic community. Whether you're joining us for the first time or are a returning guest, we hope you leave the Holly Jolly Show with a smile, a song in your heart, and wonderful memories of a night filled with warmth, humor, and holiday spirit.
         </div>
 
         <!-- Team Member 1: Aaron -->
         <div class="team-member">
-            <img src="images/aaron.jpg" alt="Aaron's photo">
+            <img src="images/aaron.png" alt="Aaron's photo">
             <div>
                 <div class="name">Aaron</div>
                 <div class="bio">
@@ -104,22 +148,26 @@
 
         <!-- Team Member 2: Bryan -->
         <div class="team-member">
-            <img src="images/bryan.jpg" alt="Bryan's photo">
+            <img src="images/bryan.png" alt="Bryan's photo">
             <div>
                 <div class="name">Bryan</div>
                 <div class="bio">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque at semper erat, ut cursus elit. Nullam luctus orci vel lorem congue, vel gravida purus tempus. Curabitur efficitur arcu a ligula interdum, ut facilisis ligula sollicitudin. Duis ac urna sit amet nisi fermentum ultricies. Maecenas bibendum consequat orci, nec finibus eros tincidunt id.
+                    <p>Originally from Toronto, Bryan is a software engineer specializing in web, mobile and iOS development. A passionate advocate for creating safe, inclusive spaces for people of color and queer communities, Bryan has a deep appreciation for music and fostering environments that allow individuals to express themselves and bond through their shared talents.</p>
+                    
+                    <p>Bryan has studied under Holly for several years, playing piano, singing, and occasionally playing saxophone. After calling Seattle home for five years, Bryan recently moved to New York, where he continues to explore  ways of blending his love for music and technology. His festive spirit and commitment to the Seattle community make him an invaluable part of the Holly Jolly Holiday Show team, and he is excited to continue creating unforgettable experiences for everyone involved.</p>
                 </div>
             </div>
         </div>
 
         <!-- Team Member 3: Holly -->
         <div class="team-member">
-            <img src="images/holly.jpg" alt="Holly's photo">
+            <img src="images/holly.png" alt="Holly's photo">
             <div>
                 <div class="name">Holly</div>
                 <div class="bio">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce scelerisque felis quis nunc interdum, sit amet fermentum purus blandit. Sed sit amet enim eu elit auctor ullamcorper. Integer bibendum lorem a orci consequat, vitae luctus turpis malesuada. Morbi ac nulla vel sem varius ultricies id sed urna.
+                    <p> For over 22 years, Holly has called Seattle home, embracing the rain while nurturing her passion for music and teaching. With 20 years of experience under her belt, she has transformed her love for music into a thriving teaching business called Lydian Studio, right in the heart of Capitol Hill. Holly loves hosting student shows and themed events that showcase her students' talents, believing wholeheartedly in the power of being witnessed within a fun, supportive, creative community.</p>
+                    
+                    <p>At Lydian Studio, laughter and smiles abound, offering a musical journey tailored to each individual. Holly caters her lessons to every skill level and interest, ensuring that whether students want to master classical piano or belt out their favorite pop hits, they’ll do so with confidence and flair. So come join us at the Holly Jolly Show—let's make some music and create unforgettable memories along the way!</p>            
                 </div>
             </div>
         </div>
