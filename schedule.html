@@ -61,22 +61,6 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
-        /* Styles for the show time inputs */
-        .show-time {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-        }
-
-        .show-time input {
-            width: 48%;
-            padding: 10px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-
-        /* Adjustments for performer items to include estimated time */
         .performer-list {
             list-style: none;
             padding: 0;
@@ -85,118 +69,55 @@
 
         .performer-item {
             display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            margin-bottom: 10px;
+            flex-direction: column;
+            margin-bottom: 15px;
             background-color: #f9f9f9;
-            padding: 10px;
+            padding: 15px;
             border-radius: 4px;
-            cursor: grab;
         }
 
-        .performer-item.dragging {
-            opacity: 0.5;
+        .performer-item label {
+            font-weight: bold;
+            margin-bottom: 5px;
         }
 
-        .performer-item input[type="text"] {
-            flex: 2;
+        .performer-item input {
+            width: 100%;
             padding: 8px;
             font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            margin-right: 10px;
-        }
-
-        .performer-item input[type="number"] {
-            width: 80px;
-            margin-right: 10px;
-            padding: 8px;
-            font-size: 16px;
+            margin-bottom: 10px;
             border: 1px solid #ccc;
             border-radius: 4px;
         }
 
         .remove-button {
-            margin-left: auto;
+            align-self: flex-end;
             padding: 8px 12px;
             background-color: #dc3545;
             color: #ffffff;
             border: none;
             border-radius: 4px;
             cursor: pointer;
-            transition: background-color 0.3s;
         }
 
-        .remove-button:hover {
-            background-color: #c82333;
-        }
-
-        .add-button {
+        .add-button, .save-button {
             width: 100%;
             padding: 10px;
-            background-color: #28a745;
-            color: #ffffff;
             border: none;
             border-radius: 4px;
             font-size: 16px;
             cursor: pointer;
-            transition: background-color 0.3s;
             margin-top: 10px;
         }
 
-        .add-button:hover {
-            background-color: #218838;
+        .add-button {
+            background-color: #28a745;
+            color: #ffffff;
         }
 
         .save-button {
-            width: 100%;
-            padding: 10px;
             background-color: #007bff;
             color: #ffffff;
-            border: none;
-            border-radius: 4px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            margin-top: 20px;
-        }
-
-        .save-button:hover {
-            background-color: #0056b3;
-        }
-
-        .back-link {
-            display: block;
-            margin-top: 20px;
-            text-align: center;
-            text-decoration: none;
-            color: #007bff;
-            transition: color 0.3s;
-        }
-
-        .back-link:hover {
-            color: #0056b3;
-        }
-
-        @media (max-width: 600px) {
-            .performer-item {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .performer-item input, .performer-item button {
-                width: 100%;
-                margin: 5px 0;
-            }
-
-            .show-time input {
-                width: 100%;
-                margin-bottom: 10px;
-            }
-
-            .remove-button {
-                margin-left: 0;
-            }
         }
     </style>
 </head>
@@ -208,134 +129,93 @@
         <h2 class="subtitle">Schedule Performers</h2>
     </div>
 
-    <!-- Container for Show Times and Performer List -->
+    <!-- Container for Performer List -->
     <div class="container">
-        <!-- Show Time Inputs -->
-        <div class="show-time">
-            <input type="time" id="start-time" placeholder="Start Time">
-            <input type="time" id="end-time" placeholder="End Time">
-        </div>
-
-        <ul class="performer-list" id="performer-list">
-            <!-- Performer items will be dynamically added here -->
-        </ul>
+        <ul class="performer-list" id="performer-list"></ul>
         <button class="add-button" id="add-performer">Add Performer</button>
         <button class="save-button" id="save-schedule">Save Schedule</button>
     </div>
 
-    <!-- Back Link -->
-    <a href="index.html" class="back-link">← Back to Home</a>
-
     <script>
-        // Initialize SortableJS on the performer list
+        const binURL = 'https://api.jsonbin.io/v3/b/674a195ae41b4d34e45d0197';
+        let performers = []; // Holds the performances data
+
+        // Initialize SortableJS
         const performerList = document.getElementById('performer-list');
-        Sortable.create(performerList, {
-            animation: 150,
-            ghostClass: 'dragging',
-        });
+        Sortable.create(performerList, { animation: 150 });
 
-        // Function to create a performer list item
-        function createPerformerItem(name = '', estimatedTime = '') {
-            const li = document.createElement('li');
-            li.className = 'performer-item';
-
-            const nameInput = document.createElement('input');
-            nameInput.type = 'text';
-            nameInput.placeholder = 'Enter performer name';
-            nameInput.value = name;
-
-            const timeInput = document.createElement('input');
-            timeInput.type = 'number';
-            timeInput.placeholder = 'Est. Time (min)';
-            timeInput.min = '1';
-            timeInput.value = estimatedTime;
-
-            const removeBtn = document.createElement('button');
-            removeBtn.className = 'remove-button';
-            removeBtn.textContent = 'Remove';
-            removeBtn.onclick = () => {
-                performerList.removeChild(li);
-            };
-
-            li.appendChild(nameInput);
-            li.appendChild(timeInput);
-            li.appendChild(removeBtn);
-
-            return li;
+        // Load schedule from JSONBin
+        async function loadSchedule() {
+            try {
+                // Add ?latest=true to fetch the latest version of the bin
+                const response = await fetch(`${binURL}/latest`);
+                const data = await response.json();
+                performers = data.record.performances || [];
+                renderPerformers();
+            } catch (error) {
+                console.error('Error loading schedule:', error);
+            }
         }
 
-        // Add Performer Button Click Event
+
+        // Save schedule to JSONBin
+        async function saveSchedule() {
+            const updatedSchedule = { performances: performers };
+            try {
+                const response = await fetch(binURL, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updatedSchedule)
+                });
+                if (response.ok) alert('Schedule saved!');
+            } catch (error) {
+                console.error('Error saving schedule:', error);
+            }
+        }
+
+        // Render performers in the list
+        function renderPerformers() {
+            performerList.innerHTML = '';
+            performers.forEach((performer, index) => {
+                const li = document.createElement('li');
+                li.className = 'performer-item';
+                li.innerHTML = `
+                    <label>Name</label>
+                    <input type="text" value="${performer.name}" oninput="updatePerformer(${index}, 'name', this.value)">
+                    <label>Type</label>
+                    <input type="text" value="${performer.type}" oninput="updatePerformer(${index}, 'type', this.value)">
+                    <label>Start Time</label>
+                    <input type="time" value="${performer.startTime}" oninput="updatePerformer(${index}, 'startTime', this.value)">
+                    <label>End Time</label>
+                    <input type="time" value="${performer.endTime}" oninput="updatePerformer(${index}, 'endTime', this.value)">
+                    <button class="remove-button" onclick="removePerformer(${index})">Remove</button>
+                `;
+                performerList.appendChild(li);
+            });
+        }
+
+        // Add a new performer
         document.getElementById('add-performer').addEventListener('click', () => {
-            const newItem = createPerformerItem();
-            performerList.appendChild(newItem);
+            performers.push({ name: '', type: '', startTime: '', endTime: '' });
+            renderPerformers();
         });
 
-        // Save Schedule Button Click Event
-        document.getElementById('save-schedule').addEventListener('click', () => {
-            const startTime = document.getElementById('start-time').value;
-            const endTime = document.getElementById('end-time').value;
-
-            if (!startTime || !endTime) {
-                alert('Please enter both the start time and end time of the show.');
-                return;
-            }
-
-            const performers = [];
-            const items = performerList.querySelectorAll('.performer-item');
-            let totalEstimatedTime = 0;
-
-            items.forEach(item => {
-                const nameInput = item.querySelector('input[type="text"]');
-                const timeInput = item.querySelector('input[type="number"]');
-                const name = nameInput.value.trim();
-                const estimatedTime = parseInt(timeInput.value);
-
-                if (name && estimatedTime > 0) {
-                    performers.push({ name, estimatedTime });
-                    totalEstimatedTime += estimatedTime;
-                }
-            });
-
-            if (performers.length === 0) {
-                alert('Please add at least one performer with an estimated time.');
-                return;
-            }
-
-            // Calculate the schedule
-            const schedule = calculateSchedule(startTime, performers);
-
-            // For demonstration, we'll log the schedule to the console.
-            console.log('Show Start Time:', startTime);
-            console.log('Show End Time:', endTime);
-            console.log('Scheduled Performers:', schedule);
-
-            alert('Schedule saved successfully!');
-        });
-
-        // Function to calculate the schedule based on start time and performers
-        function calculateSchedule(startTime, performers) {
-            let [hours, minutes] = startTime.split(':').map(Number);
-            const schedule = performers.map(performer => {
-                const start = `${padZero(hours)}:${padZero(minutes)}`;
-                minutes += performer.estimatedTime;
-                while (minutes >= 60) {
-                    minutes -= 60;
-                    hours += 1;
-                }
-                const end = `${padZero(hours)}:${padZero(minutes)}`;
-                return {
-                    ...performer,
-                    startTime: start,
-                    endTime: end
-                };
-            });
-            return schedule;
+        // Update performer
+        function updatePerformer(index, field, value) {
+            performers[index][field] = value;
         }
 
-        // Helper function to pad single digit numbers with leading zero
-        function padZero(num) {
-            return num.toString().padStart(2, '0');
+        // Remove performer
+        function removePerformer(index) {
+            performers.splice(index, 1);
+            renderPerformers();
         }
+
+        // Save button click event
+        document.getElementById('save-schedule').addEventListener('click', saveSchedule);
+
+        // Load schedule on page load
+        loadSchedule();
     </script>
 </body>
 </html>
