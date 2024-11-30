@@ -143,89 +143,98 @@
         <button class="save-button" id="save-schedule">Save Schedule</button>
     </div>
 
-    <script>
-        const binURL = 'https://api.jsonbin.io/v3/b/674a195ae41b4d34e45d0197';
-        let performers = []; // Holds the performances data
+<!-- HTML structure remains the same, no additional global email textbox -->
+<div class="container">
+    <ul class="performer-list" id="performer-list"></ul>
+    <button class="add-button" id="add-performer">Add Performer</button>
+    <button class="save-button" id="save-schedule">Save Schedule</button>
+</div>
 
-        // Initialize SortableJS
-        const performerList = document.getElementById('performer-list');
-        Sortable.create(performerList, { animation: 150 });
+<script>
+    const binURL = 'https://api.jsonbin.io/v3/b/674a195ae41b4d34e45d0197';
+    let performers = []; // Holds the performers data
 
-        // Load schedule from JSONBin
-        async function loadSchedule() {
-            try {
-                // Add /latest to fetch the latest version of the bin
-                const response = await fetch(`${binURL}/latest`);
-                const data = await response.json();
-                performers = data.record.performances || [];
-                renderPerformers();
-            } catch (error) {
-                console.error('Error loading schedule:', error);
-            }
+    // Initialize SortableJS
+    const performerList = document.getElementById('performer-list');
+    Sortable.create(performerList, { animation: 150 });
+
+    // Load schedule from JSONBin
+    async function loadSchedule() {
+        try {
+            const response = await fetch(`${binURL}/latest`);
+            const data = await response.json();
+            performers = data.record.performances || [];
+            renderPerformers();
+        } catch (error) {
+            console.error('Error loading schedule:', error);
         }
+    }
 
-        // Save schedule to JSONBin
-        async function saveSchedule() {
-            const updatedSchedule = { performances: performers };
-            try {
-                const response = await fetch(binURL, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(updatedSchedule)
-                });
-                if (response.ok) alert('Schedule saved!');
-            } catch (error) {
-                console.error('Error saving schedule:', error);
-            }
-        }
-
-        // Render performers in the list
-        function renderPerformers() {
-            performerList.innerHTML = '';
-            performers.forEach((performer, index) => {
-                const li = document.createElement('li');
-                li.className = 'performer-item';
-                li.innerHTML = `
-                    <div class="time-stack">
-                        <label>Start Time</label>
-                        <input type="time" value="${performer.startTime}" oninput="updatePerformer(${index}, 'startTime', this.value)">
-                        <label>End Time</label>
-                        <input type="time" value="${performer.endTime}" oninput="updatePerformer(${index}, 'endTime', this.value)">
-                    </div>
-                    <div class="details-stack">
-                        <label>Name</label>
-                        <input type="text" value="${performer.name}" oninput="updatePerformer(${index}, 'name', this.value)">
-                        <label>Type</label>
-                        <input type="text" value="${performer.type}" oninput="updatePerformer(${index}, 'type', this.value)">
-                    </div>
-                    <button class="remove-button" onclick="removePerformer(${index})">Remove</button>
-                `;
-                performerList.appendChild(li);
+    // Save schedule to JSONBin
+    async function saveSchedule() {
+        const updatedSchedule = { performances: performers };
+        try {
+            const response = await fetch(binURL, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updatedSchedule),
             });
+            if (response.ok) alert('Schedule saved!');
+        } catch (error) {
+            console.error('Error saving schedule:', error);
         }
+    }
 
-        // Add a new performer
-        document.getElementById('add-performer').addEventListener('click', () => {
-            performers.push({ startTime: '', endTime: '', name: '', type: '' });
-            renderPerformers();
+    // Render performers in the list
+    function renderPerformers() {
+        performerList.innerHTML = '';
+        performers.forEach((performer, index) => {
+            const li = document.createElement('li');
+            li.className = 'performer-item';
+            li.innerHTML = `
+                <div class="time-stack">
+                    <label>Start Time</label>
+                    <input type="time" value="${performer.startTime}" oninput="updatePerformer(${index}, 'startTime', this.value)">
+                    <label>End Time</label>
+                    <input type="time" value="${performer.endTime}" oninput="updatePerformer(${index}, 'endTime', this.value)">
+                </div>
+                <div class="details-stack">
+                    <label>Name</label>
+                    <input type="text" value="${performer.name}" oninput="updatePerformer(${index}, 'name', this.value)">
+                    <label>Type</label>
+                    <input type="text" value="${performer.type}" oninput="updatePerformer(${index}, 'type', this.value)">
+                    <label>Email</label>
+                    <input type="email" value="${performer.email || ''}" oninput="updatePerformer(${index}, 'email', this.value)">
+                </div>
+                <button class="remove-button" onclick="removePerformer(${index})">Remove</button>
+            `;
+            performerList.appendChild(li);
         });
+    }
 
-        // Update performer
-        function updatePerformer(index, field, value) {
-            performers[index][field] = value;
-        }
+    // Add a new performer
+    document.getElementById('add-performer').addEventListener('click', () => {
+        performers.push({ startTime: '', endTime: '', name: '', type: '', email: '' });
+        renderPerformers();
+    });
 
-        // Remove performer
-        function removePerformer(index) {
-            performers.splice(index, 1);
-            renderPerformers();
-        }
+    // Update performer
+    function updatePerformer(index, field, value) {
+        performers[index][field] = value;
+    }
 
-        // Save button click event
-        document.getElementById('save-schedule').addEventListener('click', saveSchedule);
+    // Remove performer
+    function removePerformer(index) {
+        performers.splice(index, 1);
+        renderPerformers();
+    }
 
-        // Load schedule on page load
-        loadSchedule();
-    </script>
+    // Save button click event
+    document.getElementById('save-schedule').addEventListener('click', saveSchedule);
+
+    // Load schedule on page load
+    loadSchedule();
+</script>
+
 </body>
 </html>
