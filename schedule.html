@@ -68,21 +68,28 @@
         }
 
         .performer-item {
-            display: flex;
-            flex-direction: column;
+            display: flex; /* HStack */
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 15px;
             background-color: #f9f9f9;
             padding: 15px;
             border-radius: 4px;
         }
 
-        .performer-item label {
+        .time-stack, .details-stack {
+            display: flex;
+            flex-direction: column; /* VStack */
+            flex: 1;
+            margin: 0 10px;
+        }
+
+        .time-stack label, .details-stack label {
             font-weight: bold;
             margin-bottom: 5px;
         }
 
-        .performer-item input {
-            width: 100%;
+        .time-stack input, .details-stack input {
             padding: 8px;
             font-size: 16px;
             margin-bottom: 10px;
@@ -147,7 +154,7 @@
         // Load schedule from JSONBin
         async function loadSchedule() {
             try {
-                // Add ?latest=true to fetch the latest version of the bin
+                // Add /latest to fetch the latest version of the bin
                 const response = await fetch(`${binURL}/latest`);
                 const data = await response.json();
                 performers = data.record.performances || [];
@@ -156,7 +163,6 @@
                 console.error('Error loading schedule:', error);
             }
         }
-
 
         // Save schedule to JSONBin
         async function saveSchedule() {
@@ -180,14 +186,18 @@
                 const li = document.createElement('li');
                 li.className = 'performer-item';
                 li.innerHTML = `
-                    <label>Name</label>
-                    <input type="text" value="${performer.name}" oninput="updatePerformer(${index}, 'name', this.value)">
-                    <label>Type</label>
-                    <input type="text" value="${performer.type}" oninput="updatePerformer(${index}, 'type', this.value)">
-                    <label>Start Time</label>
-                    <input type="time" value="${performer.startTime}" oninput="updatePerformer(${index}, 'startTime', this.value)">
-                    <label>End Time</label>
-                    <input type="time" value="${performer.endTime}" oninput="updatePerformer(${index}, 'endTime', this.value)">
+                    <div class="time-stack">
+                        <label>Start Time</label>
+                        <input type="time" value="${performer.startTime}" oninput="updatePerformer(${index}, 'startTime', this.value)">
+                        <label>End Time</label>
+                        <input type="time" value="${performer.endTime}" oninput="updatePerformer(${index}, 'endTime', this.value)">
+                    </div>
+                    <div class="details-stack">
+                        <label>Name</label>
+                        <input type="text" value="${performer.name}" oninput="updatePerformer(${index}, 'name', this.value)">
+                        <label>Type</label>
+                        <input type="text" value="${performer.type}" oninput="updatePerformer(${index}, 'type', this.value)">
+                    </div>
                     <button class="remove-button" onclick="removePerformer(${index})">Remove</button>
                 `;
                 performerList.appendChild(li);
@@ -196,7 +206,7 @@
 
         // Add a new performer
         document.getElementById('add-performer').addEventListener('click', () => {
-            performers.push({ name: '', type: '', startTime: '', endTime: '' });
+            performers.push({ startTime: '', endTime: '', name: '', type: '' });
             renderPerformers();
         });
 
