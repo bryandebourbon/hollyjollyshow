@@ -9,7 +9,6 @@
     <!-- SortableJS is commented out -->
     <!-- <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script> -->
     <style>
-        /* Basic styles for the page */
         body, html {
             margin: 0;
             padding: 0;
@@ -54,32 +53,69 @@
 
         .container {
             width: 100%;
-            max-width: 600px;
+            max-width: 900px;
             background-color: #ffffff;
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
-        .performer-list {
+        #toggle-edit {
+            margin-bottom: 20px;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            background-color: #dc3545;
+            color: #ffffff;
+            border: none;
+            border-radius: 4px;
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        body.editing #toggle-edit {
+            background-color: #28a745;
+        }
+
+        .timeslot-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .timeslot-row {
+            display: grid;
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 4px;
+        }
+
+        .timeslot-label {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .timeslot-performers {
             list-style: none;
             padding: 0;
             margin: 0;
         }
 
         .performer-item {
-            display: flex; /* HStack */
+            display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 15px;
-            background-color: #f9f9f9;
+            background-color: #ffffff;
             padding: 15px;
             border-radius: 4px;
+            border: 1px solid #ccc;
         }
 
         .time-stack, .details-stack {
             display: flex;
-            flex-direction: column; /* VStack */
+            flex-direction: column;
             flex: 1;
             margin: 0 10px;
         }
@@ -107,7 +143,7 @@
             cursor: pointer;
         }
 
-        .add-button, .save-button {
+        .save-button {
             width: 100%;
             padding: 10px;
             border: none;
@@ -115,14 +151,6 @@
             font-size: 16px;
             cursor: pointer;
             margin-top: 10px;
-        }
-
-        .add-button {
-            background-color: #28a745;
-            color: #ffffff;
-        }
-
-        .save-button {
             background-color: #007bff;
             color: #ffffff;
         }
@@ -136,34 +164,70 @@
         <h2 class="subtitle">Schedule Performers</h2>
     </div>
 
-    <!-- Container for Performer List -->
     <div class="container">
-        <ul class="performer-list" id="performer-list"></ul>
-        <button class="add-button" id="add-performer">Add Performer</button>
+        <button id="toggle-edit">Edit</button>
+        <div class="timeslot-container" id="timeslot-container"></div>
         <button class="save-button" id="save-schedule">Save Schedule</button>
     </div>
 
 <script>
     const binURL = 'https://api.jsonbin.io/v3/b/674a195ae41b4d34e45d0197';
-    let performers = []; // Holds the performers data
+    let performers = [];
 
-    // Initialize SortableJS (Commented out)
-    // const performerList = document.getElementById('performer-list');
-    // Sortable.create(performerList, { animation: 150 });
+    function generateTimeslots(start, end, interval) {
+        const slots = [];
+        let current = new Date(start.getTime());
+        while (current < end) {
+            const next = new Date(current.getTime() + interval * 60000);
+            slots.push({ start: current, end: next });
+            current = next;
+        }
+        return slots;
+    }
 
-    // Load schedule from JSONBin
+    const startTime = new Date();
+    startTime.setHours(19,0,0,0);
+    const endTime = new Date();
+    endTime.setHours(21,30,0,0);
+    let timeslots = generateTimeslots(startTime, endTime, 5);
+
     async function loadSchedule() {
         try {
             const response = await fetch(`${binURL}/latest`);
             const data = await response.json();
             performers = data.record.performances || [];
-            renderPerformers();
+            performers.forEach(p => {
+                if (typeof p.timeslot === 'undefined') p.timeslot = null;
+            });
+            assignPerformersToTimeslots();
+            renderTimeslots();
         } catch (error) {
             console.error('Error loading schedule:', error);
         }
     }
 
-    // Save schedule to JSONBin
+    function assignPerformersToTimeslots() {
+        let i = 0;
+        performers.forEach(p => {
+            p.timeslot = i < timeslots.length ? formatTimeslot(timeslots[i]) : null;
+            i++;
+        });
+    }
+
+    function formatTime(date) {
+        let hours = date.getHours();
+        const minutes = date.getMinutes();
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12;
+        hours = hours || 12;
+        const minStr = minutes < 10 ? '0' + minutes : minutes;
+        return `${hours}:${minStr} ${ampm}`;
+    }
+
+    function formatTimeslot(slot) {
+        return `${formatTime(slot.start)}-${formatTime(slot.end)}`;
+    }
+
     async function saveSchedule() {
         const updatedSchedule = { performances: performers };
         try {
@@ -178,59 +242,181 @@
         }
     }
 
-    // Render performers in the list
-    function renderPerformers() {
-        const performerList = document.getElementById('performer-list');
-        performerList.innerHTML = '';
-        performers.forEach((performer, index) => {
-            const li = document.createElement('li');
-            li.className = 'performer-item';
-            li.innerHTML = `
-                <div class="time-stack">
-                    <label>Start Time</label>
-                    <input type="time" value="${performer.startTime}" oninput="updatePerformer(${index}, 'startTime', this.value)">
-                    <label>End Time</label>
-                    <input type="time" value="${performer.endTime}" oninput="updatePerformer(${index}, 'endTime', this.value)">
-                </div>
-                <div class="details-stack">
-                    <label>Name</label>
-                    <input type="text" value="${performer.name}" oninput="updatePerformer(${index}, 'name', this.value)">
-                    <label>Title</label>
-                    <input type="text" value="${performer.title}" oninput="updatePerformer(${index}, 'title', this.value)">
-                    <label>Email</label>
-                    <input type="email" value="${performer.email || ''}" oninput="updatePerformer(${index}, 'email', this.value)">
-                    <label>Equipment</label>
-                    <input type="text" value="${performer.equipment || ''}" oninput="updatePerformer(${index}, 'equipment', this.value)">
-                </div>
-                <button class="remove-button" onclick="removePerformer(${index})">Remove</button>
-            `;
-            performerList.appendChild(li);
+    function renderTimeslots() {
+        const container = document.getElementById('timeslot-container');
+        container.innerHTML = '';
+
+        const grouped = {};
+        timeslots.forEach(ts => {
+            grouped[formatTimeslot(ts)] = [];
         });
+
+        performers.forEach((p, index) => {
+            if (p.timeslot && grouped[p.timeslot]) grouped[p.timeslot].push({ performer: p, index: index });
+        });
+
+        timeslots.forEach(slot => {
+            const slotLabel = formatTimeslot(slot);
+            const row = document.createElement('div');
+            row.className = 'timeslot-row';
+            const labelDiv = document.createElement('div');
+            labelDiv.className = 'timeslot-label';
+            labelDiv.textContent = "";//slotLabel;
+            const performersList = document.createElement('ul');
+            performersList.className = 'timeslot-performers';
+            performersList.setAttribute('data-timeslot', slotLabel);
+
+            grouped[slotLabel].forEach(obj => {
+                const li = document.createElement('li');
+                li.className = 'performer-item';
+                li.innerHTML = `
+                    <div class="time-stack">
+                        <label>Start Time</label>
+                        <input type="time" value="${obj.performer.startTime}" oninput="updatePerformer(${obj.index}, 'startTime', this.value)">
+                        <label>End Time</label>
+                        <input type="time" value="${obj.performer.endTime}" oninput="updatePerformer(${obj.index}, 'endTime', this.value)">
+                    </div>
+                    <div class="details-stack">
+                        <label>Name</label>
+                        <input type="text" value="${obj.performer.name}" oninput="updatePerformer(${obj.index}, 'name', this.value)">
+                        <label>Title</label>
+                        <input type="text" value="${obj.performer.title}" oninput="updatePerformer(${obj.index}, 'title', this.value)">
+                        <label>Email</label>
+                        <input type="email" value="${obj.performer.email || ''}" oninput="updatePerformer(${obj.index}, 'email', this.value)">
+                        <label>Equipment</label>
+                        <input type="text" value="${obj.performer.equipment || ''}" oninput="updatePerformer(${obj.index}, 'equipment', this.value)">
+                    </div>
+                    <button class="remove-button" onclick="removePerformer(${obj.index})">Remove</button>
+                `;
+                performersList.appendChild(li);
+            });
+
+            row.appendChild(labelDiv);
+            row.appendChild(performersList);
+            container.appendChild(row);
+        });
+
+        if (editHandler && editHandler.editing) {
+            editHandler.initSortables();
+        }
     }
 
-    // Add a new performer
-    document.getElementById('add-performer').addEventListener('click', () => {
-        performers.push({ startTime: '', endTime: '', name: '', title: '', email: '', equipment: '' });
-        renderPerformers();
-    });
-
-    // Update performer
     function updatePerformer(index, field, value) {
         performers[index][field] = value;
     }
 
-    // Remove performer
     function removePerformer(index) {
         performers.splice(index, 1);
-        renderPerformers();
+        assignPerformersToTimeslots();
+        renderTimeslots();
     }
 
-    // Save button click event
     document.getElementById('save-schedule').addEventListener('click', saveSchedule);
 
-    // Load schedule on page load
     loadSchedule();
 </script>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+<script>
+class EditModeHandler {
+    constructor() {
+        this.editing = false
+        this.sortables = []
+    }
+    initSortables() {
+        this.sortables.forEach(s => s.destroy())
+        this.sortables = []
+        const allLists = document.querySelectorAll('.timeslot-performers')
+        allLists.forEach(list => {
+            const s = Sortable.create(list, {
+                group: 'shared',
+                animation: 150,
+                onEnd: evt => {
+                    const oldIndex = evt.oldIndex
+                    const newIndex = evt.newIndex
+                    const from = evt.from.getAttribute('data-timeslot') || null
+                    const to = evt.to.getAttribute('data-timeslot') || null
+                    let fromPerformers = performers.filter(p => p.timeslot === from)
+                    let movedPerformer = fromPerformers[oldIndex]
+                    if (movedPerformer) {
+                        const idx = performers.findIndex(p => p === movedPerformer)
+                        if (idx > -1) performers.splice(idx, 1)
+                        movedPerformer.timeslot = to
+                        const baseIndex = performers.filter(p => p.timeslot !== null && p.timeslot < to).length
+                        performers.splice(baseIndex + newIndex, 0, movedPerformer)
+                    }
+                    renderTimeslots()
+                }
+            })
+            this.sortables.push(s)
+        })
+    }
+    enableEditMode() {
+        this.editing = true
+        document.body.classList.add('editing')
+        document.getElementById('toggle-edit').textContent = 'Editing...'
+        this.initSortables()
+    }
+    disableEditMode() {
+        this.sortables.forEach(s => s.destroy())
+        this.sortables = []
+        this.editing = false
+        document.body.classList.remove('editing')
+        document.getElementById('toggle-edit').textContent = 'Edit'
+        saveSchedule()
+    }
+    toggleEditMode() {
+        if (this.editing) {
+            this.disableEditMode()
+        } else {
+            this.enableEditMode()
+        }
+    }
+}
+const editHandler = new EditModeHandler()
+document.getElementById('toggle-edit').addEventListener('click', () => {
+    editHandler.toggleEditMode()
+})
 
+class TimeslotManager {
+    constructor(binURL) {
+        this.binURL = binURL;
+    }
+    async init() {
+        const response = await fetch(this.binURL+'/latest');
+        const fullData = await response.json();
+        const timesData = fullData.record.times || [];
+        if (timesData.some(t => t.startTime !== "" && t.endTime !== "")) {
+            let newSlots = this.generateFromData(timesData);
+            timeslots = newSlots.map(s => ({ start: s.start, end: s.end }));
+            assignPerformersToTimeslots();
+            renderTimeslots();
+        }
+    }
+    generateFromData(timesData) {
+        let slots = [];
+        for (const t of timesData) {
+            if (t.startTime && t.endTime && t.startTime.trim() !== "" && t.endTime.trim() !== "") {
+                let start = this.parseTime(t.startTime);
+                let end = this.parseTime(t.endTime);
+                if (start && end && end > start) {
+                    slots.push({ start: start, end: end });
+                }
+            }
+        }
+        return slots.length > 0 ? slots : timeslots;
+    }
+    parseTime(timeStr) {
+        let [hours, minutes] = timeStr.split(':');
+        let d = new Date();
+        d.setHours(parseInt(hours), parseInt(minutes),0,0);
+        return d;
+    }
+}
+
+setTimeout(() => {
+    let tm = new TimeslotManager(binURL);
+    tm.init();
+}, 2000);
+</script>
 </body>
 </html>
