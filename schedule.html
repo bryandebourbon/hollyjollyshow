@@ -9,13 +9,19 @@
     <!-- SortableJS is commented out -->
     <!-- <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script> -->
     <style>
-        body, html {
+        * {
+            box-sizing: border-box;
+        }
+
+        html, body {
             margin: 0;
             padding: 0;
             width: 100%;
-            height: 100%;
-            background-color: #f0f0f0;
+            overflow-x: hidden;
             font-family: Arial, sans-serif;
+        }
+
+        body {
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -26,6 +32,7 @@
         .header {
             text-align: center;
             margin-bottom: 20px;
+            max-width: 100%;
         }
 
         .header .title {
@@ -34,6 +41,7 @@
             color: #FF0000;
             text-shadow: 2px 2px 4px #000000;
             margin: 0;
+            word-wrap: break-word;
         }
 
         .header .subtitle {
@@ -41,6 +49,7 @@
             font-size: 24px;
             color: #FF0000;
             margin: 10px 0 0 0;
+            word-wrap: break-word;
         }
 
         .separator {
@@ -49,15 +58,17 @@
             border: 0;
             height: 1px;
             background-color: #ff0000;
+            max-width: 100%;
         }
 
         .container {
             width: 100%;
-            max-width: 900px;
+            max-width: 100%;
             background-color: #ffffff;
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            overflow-x: hidden;
         }
 
         #toggle-edit {
@@ -82,6 +93,8 @@
             display: flex;
             flex-direction: column;
             gap: 20px;
+            width: 100%;
+            max-width: 100%;
         }
 
         .timeslot-row {
@@ -89,35 +102,42 @@
             background-color: #f9f9f9;
             padding: 20px;
             border-radius: 4px;
+            width: 100%;
         }
 
         .timeslot-label {
             display: flex;
             flex-direction: column;
+            max-width: 100%;
+            overflow-x: hidden;
         }
 
         .timeslot-performers {
             list-style: none;
             padding: 0;
             margin: 0;
+            max-width: 100%;
         }
 
         .performer-item {
             display: flex;
+            flex-wrap: wrap;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-start;
             margin-bottom: 15px;
             background-color: #ffffff;
             padding: 15px;
             border-radius: 4px;
             border: 1px solid #ccc;
+            width: 100%;
         }
 
         .time-stack, .details-stack {
             display: flex;
             flex-direction: column;
             flex: 1;
-            margin: 0 10px;
+            margin: 0 10px 10px 0;
+            min-width: 100px;
         }
 
         .time-stack label, .details-stack label {
@@ -131,16 +151,18 @@
             margin-bottom: 10px;
             border: 1px solid #ccc;
             border-radius: 4px;
+            width: 100%;
+            max-width: 100%;
         }
 
         .remove-button {
-            align-self: flex-end;
             padding: 8px 12px;
             background-color: #dc3545;
             color: #ffffff;
             border: none;
             border-radius: 4px;
             cursor: pointer;
+            margin-top: auto;
         }
 
         .save-button {
@@ -153,6 +175,30 @@
             margin-top: 10px;
             background-color: #007bff;
             color: #ffffff;
+        }
+
+        .red-active {
+            background-color: red !important;
+        }
+
+        .toggle-red-button {
+            margin-top: 10px;
+            padding: 8px 12px;
+            background-color: #ff0000;
+            color: #ffffff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        @media (max-width: 600px) {
+            .performer-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .time-stack, .details-stack {
+                margin-right: 0;
+            }
         }
     </style>
 </head>
@@ -198,6 +244,7 @@
             performers = data.record.performances || [];
             performers.forEach(p => {
                 if (typeof p.timeslot === 'undefined') p.timeslot = null;
+                if (typeof p.highlighted === 'undefined') p.highlighted = false;
             });
             assignPerformersToTimeslots();
             renderTimeslots();
@@ -261,14 +308,15 @@
             row.className = 'timeslot-row';
             const labelDiv = document.createElement('div');
             labelDiv.className = 'timeslot-label';
-            labelDiv.textContent = "";//slotLabel;
+            labelDiv.textContent = "";
             const performersList = document.createElement('ul');
             performersList.className = 'timeslot-performers';
             performersList.setAttribute('data-timeslot', slotLabel);
 
             grouped[slotLabel].forEach(obj => {
                 const li = document.createElement('li');
-                li.className = 'performer-item';
+                li.className = 'performer-item' + (obj.performer.highlighted ? ' red-active' : '');
+                li.setAttribute('data-performer-index', obj.index);
                 li.innerHTML = `
                     <div class="time-stack">
                         <label>Start Time</label>
@@ -419,6 +467,33 @@ setTimeout(() => {
     let tm = new TimeslotManager(binURL);
     tm.init();
 }, 2000);
+</script>
+<script>
+class ToggleRedBackground {
+    init() {
+     const observer = new MutationObserver(() => {
+         document.querySelectorAll('.performer-item').forEach(item => {
+             if (!item.querySelector('.toggle-red-button')) {
+                 const btn = document.createElement('button')
+                 btn.className = 'toggle-red-button'
+                 btn.textContent = 'Toggle Red'
+                 btn.addEventListener('click', () => {
+                     const index = item.getAttribute('data-performer-index');
+                     const currentlyHighlighted = performers[index].highlighted;
+                     performers.forEach((p,i) => { p.highlighted = false; });
+                     performers[index].highlighted = !currentlyHighlighted;
+                     document.querySelectorAll('.performer-item').forEach(el => el.classList.remove('red-active'));
+                     if (performers[index].highlighted) item.classList.add('red-active');
+                     saveSchedule();
+                 })
+                 item.appendChild(btn)
+             }
+         })
+     })
+     observer.observe(document.getElementById('timeslot-container'), { childList: true, subtree: true })
+ }
+}
+window.addEventListener('load', () => { new ToggleRedBackground().init(); });
 </script>
 </body>
 </html>
