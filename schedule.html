@@ -281,6 +281,8 @@
                         <input type="text" value="${obj.performer.name}" oninput="updatePerformer(${obj.index}, 'name', this.value)">
                         <label>Title</label>
                         <input type="text" value="${obj.performer.title}" oninput="updatePerformer(${obj.index}, 'title', this.value)">
+                        <label>Venmo</label>
+                        <input type="text" value="${obj.performer.venmo || ''}" oninput="updatePerformer(${obj.index}, 'venmo', this.value)">
                         <label>Email</label>
                         <input type="email" value="${obj.performer.email || ''}" oninput="updatePerformer(${obj.index}, 'email', this.value)">
                         <label>Equipment</label>
