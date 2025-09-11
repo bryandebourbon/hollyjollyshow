@@ -4,6 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Holly Jolly Show</title>
+    
+    <!-- Open Graph / Facebook / iMessage meta tags -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://hollyjollyshow.com/">
+    <meta property="og:title" content="Holly Jolly Holiday Show - Seattle's Seasonal Variety Show">
+    <meta property="og:description" content="Join us for the 4th Annual Holly Jolly Holiday Show featuring holiday songs, comedy, drag queens, and more!">
+    <meta property="og:image" content="https://hollyjollyshow.com/images/holly-jolly-preview.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    
+    <!-- Twitter Card meta tags -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://hollyjollyshow.com/">
+    <meta property="twitter:title" content="Holly Jolly Holiday Show - Seattle's Seasonal Variety Show">
+    <meta property="twitter:description" content="Join us for the 4th Annual Holly Jolly Holiday Show featuring holiday songs, comedy, drag queens, and more!">
+    <meta property="twitter:image" content="https://hollyjollyshow.com/images/holly-jolly-preview.jpg">
+    
+    <!-- Additional meta tags for better sharing -->
+    <meta name="description" content="Seattle's seasonal variety show featuring holiday songs, comedy, drag queens, and more! Join us for the 4th Annual Holly Jolly Holiday Show.">
+    <meta name="keywords" content="Holly Jolly Holiday Show, Seattle, variety show, holiday, comedy, drag queens, music, Barboza">
+    <meta name="author" content="Holly Jolly Holiday Show">
     <!-- Link to Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
     <style>
@@ -155,20 +176,36 @@
             background: rgba(255,255,255,0.7) !important;
         }
 
+
+        /* Button disabled state during transitions */
+        .carousel-controls button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .carousel-indicator:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
     </style>
 </head>
 <body>
     <!-- Title and Link Container -->
     <div class="title-container">
         <h1 class="title">Holly Jolly Show</h1>
-        <a href="https://www.lydianstudio.com"> Take Lessons with Holly</a>
         <hr class="separator">
+        <a href="https://www.lydianstudio.com"> Take Lessons with Holly</a>
         <!-- <h1 class="subtitle">Saturday Dec 7, 2024 @ <a class="subtitle" href="https://maps.app.goo.gl/9Dr18VJxfkAUVSTDA" >Barbosa</a></h1> -->
         
         <!-- <a class="about-link" href="https://tix.axs.com/ZuaECQAAAAABcw6DAAAAAAC3%2fv%2f%2f%2fwD%2f%2f%2f%2f%2fGU5ldW1vcy9CYXJib3phL1RoZVJ1bmF3YXkA%2f%2f%2f%2f%2f%2f%2f%2f%2f%2f8%3d/shop/search?locale=en-US&axssid=pvkmolq3c5fo02ermnu1kb8nqm&preFill=1&eventid=718033&ec=BBZ241207&skin=barboza&src=AEGAXS1_WMAIN&t_originalReferringURL=&_gl=1*gjbjzj*_gcl_au*ODM5Nzg3OTUuMTczMTE4Mzg5Nw..*_ga*ODQ5NzExNzE1LjE3MzExODM4OTc.*_ga_D0FS4F37VT*MTczMTE4Mzg5Ny4xLjAuMTczMTE4Mzg5Ny42MC4wLjEyNzcwNzI0Ng..">Get Tickets</a> -->
         <br/>
         <a href="about.html" class="about-link">About</a>
+        <a href="simple-email-signup.html" class="about-link" style="margin-left: 10px;">Stay Connected</a>
     </div>
+
 
 
 
@@ -192,6 +229,7 @@
     </div>
 
     <script>
+        
         // Array of image filenames in the carousel folder
         // Simply update this array when you add/remove images from the carousel folder
         const carouselImages = [
@@ -207,56 +245,126 @@
 
         // Function to dynamically load images into the carousel
         function loadImages() {
+            console.log('📸 Starting to load carousel images...');
+            console.log(`📸 Loading ${carouselImages.length} images:`, carouselImages);
+            
             const carouselContainer = document.getElementById('carousel-images');
             carouselContainer.innerHTML = ''; // Clear existing images
             
-            carouselImages.forEach(filename => {
+            let loadedCount = 0;
+            const totalImages = carouselImages.length;
+            
+            carouselImages.forEach((filename, index) => {
+                console.log(`📸 Loading image ${index + 1}/${totalImages}: ${filename}`);
                 const img = document.createElement('img');
                 img.src = `carousel/${filename}`;
                 img.alt = filename;
-                img.onerror = function() {
-                    console.warn(`Failed to load image: ${filename}`);
+                
+                img.onload = function() {
+                    loadedCount++;
+                    console.log(`✅ Image ${index + 1}/${totalImages} loaded successfully: ${filename}`);
+                    console.log(`📸 Loaded ${loadedCount}/${totalImages} images`);
+                    
+                    if (loadedCount === totalImages) {
+                        console.log('🎉 All images loaded! Initializing carousel...');
+                        initializeCarousel();
+                    }
                 };
+                
+                img.onerror = function() {
+                    loadedCount++;
+                    console.error(`❌ Failed to load image ${index + 1}/${totalImages}: ${filename}`);
+                    console.log(`📸 Loaded ${loadedCount}/${totalImages} images (with errors)`);
+                    
+                    if (loadedCount === totalImages) {
+                        console.log('⚠️ All images processed (some failed). Initializing carousel...');
+                        initializeCarousel();
+                    }
+                };
+                
                 carouselContainer.appendChild(img);
             });
-            
-            // Initialize carousel after images are loaded
-            initializeCarousel();
         }
 
         // Initialize carousel functionality
         function initializeCarousel() {
+            console.log('🎠 Initializing carousel...');
             const images = document.querySelectorAll('#carousel-images img');
+            console.log(`🎠 Found ${images.length} images in carousel`);
             
             if (images.length === 0) {
-                console.warn('No images found in carousel folder');
+                console.warn('⚠️ No images found in carousel folder');
                 return;
             }
             
             let currentIndex = 0;
+            let isTransitioning = false; // Flag to prevent rapid clicking issues
+            let autoRotateTimeout = null; // Track auto-rotation restart timeout
+            
             
             function showImage(index) {
+                console.log(`🖼️ showImage called with index: ${index}`);
+                console.log(`🖼️ Current index before change: ${currentIndex}`);
+                console.log(`🖼️ Images length: ${images.length}`);
+                
+                if (isTransitioning) {
+                    console.log('⚠️ Transition in progress, ignoring showImage call');
+                    return;
+                }
+                
+                isTransitioning = true;
+                
+                // Disable all controls during transition
+                const allButtons = document.querySelectorAll('.carousel-controls button, .carousel-indicator');
+                allButtons.forEach(button => button.disabled = true);
+                
                 const totalImages = images.length;
-                currentIndex = (index + totalImages) % totalImages;
+                const newIndex = (index + totalImages) % totalImages;
+                console.log(`🖼️ Calculated new index: ${newIndex}`);
+                
+                currentIndex = newIndex;
                 const offset = -currentIndex * 100;
-                document.getElementById('carousel-images').style.transform = `translateX(${offset}vw)`;
+                console.log(`🖼️ Transform offset: ${offset}vw`);
+                
+                const carouselElement = document.getElementById('carousel-images');
+                carouselElement.style.transform = `translateX(${offset}vw)`;
+                
+                console.log(`🖼️ Applied transform: translateX(${offset}vw)`);
+                console.log(`🖼️ Current index after change: ${currentIndex}`);
                 
                 // Update any indicators if they exist
                 updateIndicators();
+                
+                // Reset transition flag after animation completes
+                setTimeout(() => {
+                    isTransitioning = false;
+                    
+                    // Re-enable all controls after transition
+                    const allButtons = document.querySelectorAll('.carousel-controls button, .carousel-indicator');
+                    allButtons.forEach(button => button.disabled = false);
+                    
+                    console.log('✅ Transition completed, ready for next interaction');
+                }, 500); // Match the CSS transition duration
             }
             
             function updateIndicators() {
+                console.log(`🔘 Updating indicators for current index: ${currentIndex}`);
                 const indicators = document.querySelectorAll('.carousel-indicator');
+                console.log(`🔘 Found ${indicators.length} indicators`);
                 indicators.forEach((indicator, index) => {
-                    indicator.classList.toggle('active', index === currentIndex);
+                    const isActive = index === currentIndex;
+                    indicator.classList.toggle('active', isActive);
+                    console.log(`🔘 Indicator ${index}: ${isActive ? 'ACTIVE' : 'inactive'}`);
                 });
             }
             
             function prevImage() {
+                console.log(`⬅️ prevImage called - current index: ${currentIndex}`);
                 showImage(currentIndex - 1);
             }
             
             function nextImage() {
+                console.log(`➡️ nextImage called - current index: ${currentIndex}`);
                 showImage(currentIndex + 1);
             }
             
@@ -291,12 +399,26 @@
                     margin: 0 10px;
                 `;
                 prevButton.onclick = () => {
+                    console.log('🖱️ Previous button clicked');
+                    console.log('⏸️ Clearing auto-rotation interval');
                     clearInterval(autoRotate); // Stop auto-rotation when manually navigating
-                    prevImage();
-                    // Restart auto-rotation after manual navigation
-                    setTimeout(() => {
-                        autoRotate = setInterval(nextImage, 5000);
-                    }, 3000);
+                    
+                    // Only proceed if not transitioning
+                    if (!isTransitioning) {
+                        prevImage();
+                        // Clear any existing auto-rotation restart timeout
+                        if (autoRotateTimeout) {
+                            clearTimeout(autoRotateTimeout);
+                        }
+                        // Restart auto-rotation after manual navigation
+                        console.log('⏰ Scheduling auto-rotation restart in 3 seconds');
+                        autoRotateTimeout = setTimeout(() => {
+                            console.log('🔄 Restarting auto-rotation');
+                            autoRotate = setInterval(nextImage, 5000);
+                        }, 3000);
+                    } else {
+                        console.log('⚠️ Previous button click ignored - transition in progress');
+                    }
                 };
                 prevButton.onmouseenter = () => prevButton.style.background = 'rgba(0,0,0,0.8)';
                 prevButton.onmouseleave = () => prevButton.style.background = 'rgba(0,0,0,0.5)';
@@ -305,12 +427,26 @@
                 nextButton.innerHTML = '›';
                 nextButton.style.cssText = prevButton.style.cssText;
                 nextButton.onclick = () => {
+                    console.log('🖱️ Next button clicked');
+                    console.log('⏸️ Clearing auto-rotation interval');
                     clearInterval(autoRotate); // Stop auto-rotation when manually navigating
-                    nextImage();
-                    // Restart auto-rotation after manual navigation
-                    setTimeout(() => {
-                        autoRotate = setInterval(nextImage, 5000);
-                    }, 3000);
+                    
+                    // Only proceed if not transitioning
+                    if (!isTransitioning) {
+                        nextImage();
+                        // Clear any existing auto-rotation restart timeout
+                        if (autoRotateTimeout) {
+                            clearTimeout(autoRotateTimeout);
+                        }
+                        // Restart auto-rotation after manual navigation
+                        console.log('⏰ Scheduling auto-rotation restart in 3 seconds');
+                        autoRotateTimeout = setTimeout(() => {
+                            console.log('🔄 Restarting auto-rotation');
+                            autoRotate = setInterval(nextImage, 5000);
+                        }, 3000);
+                    } else {
+                        console.log('⚠️ Next button click ignored - transition in progress');
+                    }
                 };
                 nextButton.onmouseenter = () => nextButton.style.background = 'rgba(0,0,0,0.8)';
                 nextButton.onmouseleave = () => nextButton.style.background = 'rgba(0,0,0,0.5)';
@@ -348,12 +484,26 @@
                         transition: background 0.3s;
                     `;
                     indicator.onclick = () => {
+                        console.log(`🖱️ Indicator ${i} clicked`);
+                        console.log('⏸️ Clearing auto-rotation interval');
                         clearInterval(autoRotate); // Stop auto-rotation when manually navigating
-                        showImage(i);
-                        // Restart auto-rotation after manual navigation
-                        setTimeout(() => {
-                            autoRotate = setInterval(nextImage, 5000);
-                        }, 3000);
+                        
+                        // Only proceed if not transitioning
+                        if (!isTransitioning) {
+                            showImage(i);
+                            // Clear any existing auto-rotation restart timeout
+                            if (autoRotateTimeout) {
+                                clearTimeout(autoRotateTimeout);
+                            }
+                            // Restart auto-rotation after manual navigation
+                            console.log('⏰ Scheduling auto-rotation restart in 3 seconds');
+                            autoRotateTimeout = setTimeout(() => {
+                                console.log('🔄 Restarting auto-rotation');
+                                autoRotate = setInterval(nextImage, 5000);
+                            }, 3000);
+                        } else {
+                            console.log(`⚠️ Indicator ${i} click ignored - transition in progress`);
+                        }
                     };
                     indicatorsContainer.appendChild(indicator);
                 }
@@ -363,21 +513,37 @@
             }
             
             // Auto-rotate images every 5 seconds
-            let autoRotate = setInterval(nextImage, 5000);
+            console.log('🔄 Starting auto-rotation (5 second intervals)');
+            let autoRotate = setInterval(() => {
+                console.log('⏰ Auto-rotation tick - calling nextImage()');
+                nextImage();
+            }, 5000);
             
             // Pause auto-rotation on hover
             const carousel = document.querySelector('.carousel');
-            carousel.onmouseenter = () => clearInterval(autoRotate);
+            carousel.onmouseenter = () => {
+                console.log('🖱️ Mouse entered carousel - pausing auto-rotation');
+                clearInterval(autoRotate);
+            };
             carousel.onmouseleave = () => {
-                autoRotate = setInterval(nextImage, 5000);
+                console.log('🖱️ Mouse left carousel - resuming auto-rotation');
+                autoRotate = setInterval(() => {
+                    console.log('⏰ Auto-rotation tick - calling nextImage()');
+                    nextImage();
+                }, 5000);
             };
             
             // Show first image
+            console.log('🎠 Showing first image (index 0)');
             showImage(0);
+            console.log('🎠 Carousel initialization complete!');
         }
 
         // Load carousel images when page loads
-        document.addEventListener('DOMContentLoaded', loadImages);
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🚀 DOM Content Loaded - starting carousel setup');
+            loadImages();
+        });
     </script>
 </body>
 </html>
