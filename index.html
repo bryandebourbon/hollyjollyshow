@@ -190,6 +190,35 @@
             pointer-events: none;
         }
 
+        /* Blurb overlay styles */
+        .carousel-blurb {
+            position: absolute;
+            bottom: 180px; /* Above indicators (120px) and album buttons */
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 25;
+            max-width: 800px;
+            width: 90vw;
+            box-sizing: border-box;
+            padding: 10px 16px;
+            color: #ffffff;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.45);
+            border-radius: 8px;
+            backdrop-filter: blur(1px);
+            -webkit-backdrop-filter: blur(1px);
+            transition: opacity 0.4s ease;
+            opacity: 0; /* Fade in managed via JS */
+        }
+
+        @media (max-width: 768px) {
+            .carousel-blurb {
+                bottom: 200px;
+                font-size: 14px;
+                padding: 8px 12px;
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -204,6 +233,7 @@
         <br/>
         <a href="about.html" class="about-link">About</a>
         <a href="simple-email-signup.html" class="about-link" style="margin-left: 10px;">Stay Connected</a>
+        <a href="analytics.html" class="about-link" style="margin-left: 10px;">Analytics</a>
     </div>
 
 
@@ -213,6 +243,7 @@
         <div class="carousel-images" id="carousel-images">
             <!-- Images will be dynamically added here by JavaScript -->
         </div>
+        <div id="carousel-blurb" class="carousel-blurb" aria-live="polite" role="status"></div>
     </div>
 
     <div class="controls">
@@ -241,6 +272,17 @@
             'Holly Jolly Finals-65.jpg',
             'Holly Jolly Finals-69.jpg',
             'Holly Jolly Finals-70.jpg'
+        ];
+
+        // Marketing stats/blurbs to rotate with the carousel
+        // Replace these with real stats when ready
+        const carouselStats = [
+            '250+ attendees in 2024',
+            '4 years running — Seattle’s seasonal variety show',
+            'Live band, drag, comedy, and crowd carols',
+            'Sellouts two years straight',
+            'Local artists. Big holiday energy.',
+            'sold out our space in Pioneer Square that had a limit of 120 guests standing.'
         ];
 
         // Function to dynamically load images into the carousel
@@ -301,6 +343,27 @@
             let isTransitioning = false; // Flag to prevent rapid clicking issues
             let autoRotateTimeout = null; // Track auto-rotation restart timeout
             
+            // Blurb setup and updater
+            const blurbElement = document.getElementById('carousel-blurb');
+            function updateBlurb(index) {
+                if (!blurbElement) return;
+                if (!carouselStats || carouselStats.length === 0) {
+                    blurbElement.style.display = 'none';
+                    return;
+                }
+                blurbElement.style.display = 'block';
+                const nextText = carouselStats[index % carouselStats.length];
+                if (blurbElement.innerText === nextText && blurbElement.style.opacity === '1') {
+                    return;
+                }
+                // Fade out, update, fade in
+                blurbElement.style.opacity = '0';
+                setTimeout(() => {
+                    blurbElement.innerText = nextText;
+                    blurbElement.style.opacity = '1';
+                }, 150);
+            }
+
             
             function showImage(index) {
                 console.log(`🖼️ showImage called with index: ${index}`);
@@ -334,6 +397,8 @@
                 
                 // Update any indicators if they exist
                 updateIndicators();
+                // Update blurb text to match current slide
+                updateBlurb(currentIndex);
                 
                 // Reset transition flag after animation completes
                 setTimeout(() => {
@@ -535,6 +600,13 @@
             
             // Show first image
             console.log('🎠 Showing first image (index 0)');
+            // Initialize blurb before first fade to avoid initial flash
+            if (document.getElementById('carousel-blurb') && carouselStats && carouselStats.length) {
+                const initialBlurb = document.getElementById('carousel-blurb');
+                initialBlurb.innerText = carouselStats[0 % carouselStats.length];
+                initialBlurb.style.display = 'block';
+                initialBlurb.style.opacity = '1';
+            }
             showImage(0);
             console.log('🎠 Carousel initialization complete!');
         }
