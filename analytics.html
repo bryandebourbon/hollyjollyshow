@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics - Holly Jolly Show</title>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
+            color: #222;
+        }
+
+        .page-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .title {
+            font-family: 'Great Vibes', cursive;
+            font-size: 48px;
+            color: #FF0000;
+            margin: 10px 0 0;
+        }
+
+        .nav {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .link-button {
+            font-size: 16px;
+            color: #ffffff;
+            text-decoration: none;
+            background-color: #ff0000;
+            padding: 8px 16px;
+            border-radius: 4px;
+            display: inline-block;
+            margin: 0 6px;
+            transition: background-color 0.3s;
+        }
+
+        .link-button:hover {
+            background-color: #cc0000;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            padding: 16px;
+            margin: 20px 0;
+        }
+
+        .card h2 {
+            margin-top: 0;
+            font-size: 20px;
+        }
+
+        .chart-wrap {
+            position: relative;
+            height: 420px;
+        }
+
+        .note {
+            color: #666;
+            font-size: 14px;
+            margin-top: 8px;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="page-container">
+        <div class="page-header">
+            <h1 class="title">Holly Jolly Analytics</h1>
+            <div class="nav">
+                <a href="index.html" class="link-button">Home</a>
+                <a href="about.html" class="link-button">About</a>
+                <a href="simple-email-signup.html" class="link-button">Stay Connected</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Attendance per Year</h2>
+            <div class="chart-wrap">
+                <canvas id="attendanceChart"></canvas>
+            </div>
+            <p class="note">Edit the attendance data in the script below to update the chart.</p>
+        </div>
+    </div>
+
+    <script>
+        // ================================================
+        // Attendance data: update with your real numbers
+        // Example: { year: 2024, attendees: 265 }
+        // ================================================
+        const attendanceByYear = [
+            { year: 2021, attendees: 0 },
+            { year: 2022, attendees: 0 },
+            { year: 2023, attendees: 0 },
+            { year: 2024, attendees: 0 }
+        ];
+
+        // Build bar chart
+        function renderAttendanceChart() {
+            const ctx = document.getElementById('attendanceChart');
+            if (!ctx) return;
+
+            const labels = attendanceByYear.map(item => String(item.year));
+            const dataPoints = attendanceByYear.map(item => item.attendees);
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels,
+                    datasets: [{
+                        label: 'Attendees',
+                        data: dataPoints,
+                        backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1,
+                        borderRadius: 6,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0
+                            },
+                            title: {
+                                display: true,
+                                text: 'Attendees'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Year'
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => `${ctx.parsed.y} attendees`
+                            }
+                        },
+                        legend: { display: false },
+                        title: { display: false }
+                    }
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', renderAttendanceChart);
+    </script>
+</body>
+</html>
+

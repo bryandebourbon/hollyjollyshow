@@ -27,6 +27,7 @@
     <meta name="author" content="Holly Jolly Holiday Show">
     <!-- Link to Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         /* Basic styles for the page */
         body, html {
@@ -38,7 +39,8 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            font-family: Arial, sans-serif;
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            font-size: 18px;
             background-color: #f0f0f0;
             position: relative;
         }
@@ -73,7 +75,7 @@
 
         .title {
             font-family: 'Great Vibes', cursive;
-            font-size: 64px; /* Adjust size as needed */
+            font-size: 80px; /* Larger for impact */
             color: #FF0000; /* Festive red color */
             text-shadow: 2px 2px 4px #000000; /* Adds a subtle shadow for contrast */
             margin: 0;
@@ -99,7 +101,7 @@
         }
 
         .about-link {
-            font-size: 18px;
+            font-size: 22px;
             color: #ffffff; /* White color for visibility */
             text-decoration: none;
             background-color: #ff0000; /* Festive red background */
@@ -148,7 +150,7 @@
 
         .album-button {
             padding: 15px 30px;
-            font-size: 16px;
+            font-size: 20px;
             font-weight: bold;
             background-color: #1a73e8;
             color: #ffffff;
@@ -193,14 +195,15 @@
         /* Blurb overlay styles */
         .carousel-blurb {
             position: absolute;
-            bottom: 180px; /* Above indicators (120px) and album buttons */
+            bottom: 140px; /* Closer to indicators at 120px */
             left: 50%;
             transform: translateX(-50%);
             z-index: 25;
-            max-width: 800px;
-            width: 90vw;
+            max-width: 560px; /* Narrower width */
+            width: 75vw; /* Smaller relative width */
             box-sizing: border-box;
             padding: 10px 16px;
+            font-size: 20px;
             color: #ffffff;
             text-align: center;
             background: rgba(0, 0, 0, 0.45);
@@ -213,9 +216,10 @@
 
         @media (max-width: 768px) {
             .carousel-blurb {
-                bottom: 200px;
-                font-size: 14px;
+                bottom: 140px; /* Keep close to indicators on mobile too */
+                font-size: 18px;
                 padding: 8px 12px;
+                width: 85vw; /* Slightly wider on small screens for readability */
             }
         }
 
@@ -233,7 +237,7 @@
         <br/>
         <a href="about.html" class="about-link">About</a>
         <a href="simple-email-signup.html" class="about-link" style="margin-left: 10px;">Stay Connected</a>
-        <a href="analytics.html" class="about-link" style="margin-left: 10px;">Analytics</a>
+        <!-- <a href="analytics.html" class="about-link" style="margin-left: 10px;">Analytics</a> -->
     </div>
 
 
